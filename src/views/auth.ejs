@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Auth Test</title>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.1); width: 400px; overflow: hidden; }
+    .tabs { display: flex; }
+    .tab { flex: 1; padding: 1rem; text-align: center; cursor: pointer; background: #f8f8f8; border-bottom: 2px solid #eee; font-weight: bold; color: #888; }
+    .tab.active { background: white; border-bottom: 2px solid #4f46e5; color: #4f46e5; }
+    .form-section { display: none; padding: 2rem; }
+    .form-section.active { display: block; }
+    input { width: 100%; padding: 0.75rem 1rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus { border-color: #4f46e5; }
+    button.btn { width: 100%; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; }
+    button.btn:hover { background: #4338ca; }
+    .divider { text-align: center; margin: 1rem 0; color: #aaa; font-size: 13px; position: relative; }
+    .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 42%; height: 1px; background: #eee; }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .google-wrap { display: flex; justify-content: center; margin-top: 0.5rem; }
+    pre { margin-top: 1.5rem; background: #1e1e1e; color: #4ec9b0; padding: 1rem; border-radius: 8px; font-size: 11px; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; display: none; }
+    .msg { font-size: 13px; text-align: center; margin-top: 0.5rem; }
+    .msg.ok { color: green; }
+    .msg.err { color: red; }
+    h3 { margin-bottom: 1.25rem; color: #333; }
+
+    /* OTP section */
+    .otp-section { display: none; padding: 2rem; }
+    .otp-section.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Giriş</div>
+    <div class="tab" onclick="switchTab('register')">Qeydiyyat</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="form-section active" id="tab-login">
+    <h3>Hesaba daxil ol</h3>
+    <input type="email" id="login-email" placeholder="Email" />
+    <input type="password" id="login-password" placeholder="Şifrə" />
+    <button class="btn" onclick="login()">Daxil ol</button>
+
+    <div class="divider">və ya</div>
+    <div class="google-wrap">
+      <div id="g_id_onload"
+        data-client_id="<%= googleClientId %>"
+        data-callback="handleGoogle"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with"></div>
+    </div>
+
+    <p class="msg" id="login-msg"></p>
+    <pre id="login-result"></pre>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="form-section" id="tab-register">
+    <h3>Yeni hesab yarat</h3>
+    <input type="text"  id="reg-name"     placeholder="Ad" />
+    <input type="text"  id="reg-surname"  placeholder="Soyad" />
+    <input type="email" id="reg-email"    placeholder="Email" />
+    <input type="text"  id="reg-phone"    placeholder="Telefon (994...)" />
+    <input type="password" id="reg-password" placeholder="Şifrə" />
+    <button class="btn" onclick="register()">Qeydiyyat</button>
+
+    <p class="msg" id="reg-msg"></p>
+    <pre id="reg-result"></pre>
+  </div>
+
+  <!-- OTP VERİFY (register sonra görünür) -->
+  <div class="otp-section" id="tab-otp">
+    <h3>📧 Email Təsdiq</h3>
+    <p style="font-size:13px;color:#555;margin-bottom:1rem">Emailinizə OTP göndərildi.</p>
+    <input type="text" id="otp-code" placeholder="6 rəqəmli kod" maxlength="6" />
+    <button class="btn" onclick="verifyOtp()">Təsdiqlə</button>
+    <p class="msg" id="otp-msg"></p>
+    <pre id="otp-result"></pre>
+  </div>
+</div>
+
+<script>
+  const API = "";   // same origin
+  let pendingEmail = "";
+
+  function switchTab(tab) {
+    document.querySelectorAll(".tab").forEach((t, i) => {
+      t.classList.toggle("active", (i === 0 && tab === "login") || (i === 1 && tab === "register"));
+    });
+    document.querySelectorAll(".form-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".otp-section").forEach(s => s.classList.remove("active"));
+    document.getElementById("tab-" + tab)?.classList.add("active");
+  }
+
+  function showResult(preId, msgId, data, ok) {
+    const pre = document.getElementById(preId);
+    const msg = document.getElementById(msgId);
+    pre.style.display = "block";
+    pre.textContent = JSON.stringify(data, null, 2);
+    msg.className = "msg " + (ok ? "ok" : "err");
+    msg.textContent = data.message || "";
+  }
+
+  async function login() {
+    const email    = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    const res  = await fetch(`${API}/api/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    showResult("login-result", "login-msg", data, data.success);
+    if (data.token) localStorage.setItem("token", data.token);
+  }
+
+  async function register() {
+    const body = {
+      name:     document.getElementById("reg-name").value,
+      surname:  document.getElementById("reg-surname").value,
+      email:    document.getElementById("reg-email").value,
+      phone:    document.getElementById("reg-phone").value,
+      password: document.getElementById("reg-password").value,
+    };
+    const res  = await fetch(`${API}/api/auth/register`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await res.json();
+    showResult("reg-result", "reg-msg", data, data.success);
+    if (data.success) {
+      pendingEmail = body.email;
+      // OTP səhifəsinə keç
+      document.querySelectorAll(".form-section").forEach(s => s.classList.remove("active"));
+      document.getElementById("tab-otp").classList.add("active");
+    }
+  }
+
+  async function verifyOtp() {
+    const otp = document.getElementById("otp-code").value;
+    const res  = await fetch(`${API}/api/auth/verify-email`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: pendingEmail, otp }) });
+    const data = await res.json();
+    showResult("otp-result", "otp-msg", data, data.success);
+    if (data.token) localStorage.setItem("token", data.token);
+  }
+
+  async function handleGoogle(response) {
+    const res  = await fetch(`${API}/api/auth/google`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken: response.credential }) });
+    const data = await res.json();
+    showResult("login-result", "login-msg", data, data.success);
+    if (data.token) localStorage.setItem("token", data.token);
+  }
+</script>
+
+</body>
+</html>
