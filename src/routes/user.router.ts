@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { protect } from "../middlewares/auth.middleware";
-import { changePassword, deleteAccount, getAllUsers, getProfile, getUserById, updateProfile } from "../controller/user.controller";
+import { changePassword, deleteAccount, getAllUsers, getProfile, getUserById, updateProfile } from "../controllers/user.controller";
 
 const router = Router();
 

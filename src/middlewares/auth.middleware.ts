@@ -3,7 +3,7 @@ import { verifyToken } from "../utils/jwt";
 import User from "../models/user.model";
 
 export interface AuthRequest extends Request {
-  user?: User;
+  user?: InstanceType<typeof User>;
 }
 
 export const protect = async (

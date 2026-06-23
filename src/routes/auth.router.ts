@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { protect } from "../middlewares/auth.middleware";
-import { forgotPassword, getMe, googleAuth, login, register, resendOtp, resetPassword, verifyEmail } from "../controller/auth.controller";
+import { forgotPassword, getMe, googleAuth, login, register, resendOtp, resetPassword, verifyEmail } from "../controllers/auth.controller";
 
 const router = Router();
 
