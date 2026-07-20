@@ -1,0 +1,112 @@
+/api/events:
+  get:
+    summary: Get all events (search & filter)
+    tags: [Events]
+    parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search by event name
+      - in: query
+        name: category_id
+        schema:
+          type: integer
+      - in: query
+        name: venue_id
+        schema:
+          type: integer
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create event
+    tags: [Events]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Event"
+    responses:
+      "201":
+        description: Created
+      "400":
+        description: Invalid category_id or venue_id
+
+/api/events/bulk:
+  post:
+    summary: Bulk create events
+    tags: [Events]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Event"
+    responses:
+      "201":
+        description: Created
+      "400":
+        description: Body must be an array, or invalid category_id/venue_id
+
+/api/events/{id}:
+  get:
+    summary: Get event by id
+    tags: [Events]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: Not found
+  put:
+    summary: Update event
+    tags: [Events]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Event"
+    responses:
+      "200":
+        description: Updated
+  delete:
+    summary: Delete event
+    tags: [Events]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Deleted

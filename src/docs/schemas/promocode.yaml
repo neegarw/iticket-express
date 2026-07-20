@@ -1,0 +1,23 @@
+type: object
+required:
+  - code
+  - percentage
+  - expiry_date
+  - event_id
+properties:
+  id:
+    type: integer
+    example: 1
+  code:
+    type: string
+    example: SUMMER25
+  percentage:
+    type: integer
+    example: 25
+  expiry_date:
+    type: string
+    format: date-time
+    example: "2026-12-31T23:59:59.000Z"
+  event_id:
+    type: integer
+    example: 4

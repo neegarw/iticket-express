@@ -1,0 +1,39 @@
+type: object
+required:
+  - name
+  - date
+  - sale_date_end
+  - category_id
+  - venue_id
+properties:
+  id:
+    type: integer
+    example: 1
+  name:
+    type: string
+    example: Rock Konserti
+  description:
+    type: string
+    nullable: true
+    example: Açıq hava rok konserti
+  date:
+    type: string
+    format: date-time
+    example: "2026-09-15T19:00:00.000Z"
+  sale_date_end:
+    type: string
+    format: date-time
+    example: "2026-09-14T23:59:59.000Z"
+  category_id:
+    type: integer
+    example: 2
+  venue_id:
+    type: integer
+    example: 1
+  minimum_age:
+    type: integer
+    example: 16
+  image_url:
+    type: string
+    nullable: true
+    example: https://example.com/event.jpg

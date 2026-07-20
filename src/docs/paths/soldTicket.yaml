@@ -1,0 +1,98 @@
+/api/sold-tickets:
+  get:
+    summary: Get all sold tickets
+    tags: [SoldTickets]
+    parameters:
+      - in: query
+        name: sortBy
+        schema:
+          type: string
+          enum: [id, seating_number, sold_price, seating_id, order_id]
+        description: Field to sort by
+      - in: query
+        name: order
+        schema:
+          type: string
+          enum: [ASC, DESC]
+        description: Sort direction
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Items per page (max 100)
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create sold ticket
+    tags: [SoldTickets]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SoldTicket"
+    responses:
+      "201":
+        description: Created
+
+/api/sold-tickets/{id}:
+  get:
+    summary: Get sold ticket by id
+    tags: [SoldTickets]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: Not found
+  put:
+    summary: Update sold ticket
+    tags: [SoldTickets]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SoldTicket"
+    responses:
+      "200":
+        description: Updated
+      "404":
+        description: Not found
+  delete:
+    summary: Delete sold ticket
+    tags: [SoldTickets]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Deleted
+      "404":
+        description: Not found

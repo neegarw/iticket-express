@@ -1,0 +1,32 @@
+type: object
+required:
+  - date
+  - status
+  - total_price
+  - seating_id
+  - user_id
+properties:
+  id:
+    type: integer
+    example: 1
+  date:
+    type: string
+    format: date-time
+    example: "2026-07-20T12:00:00.000Z"
+  status:
+    type: string
+    enum: [pending, confirmed, cancelled]
+    example: pending
+  total_price:
+    type: integer
+    example: 90
+  seating_id:
+    type: integer
+    example: 3
+  user_id:
+    type: integer
+    example: 7
+  promocode_id:
+    type: integer
+    nullable: true
+    example: 2

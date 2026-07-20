@@ -1,0 +1,101 @@
+/api/seatings:
+  get:
+    summary: Get all seatings
+    tags: [Seatings]
+    parameters:
+      - in: query
+        name: venue_id
+        schema:
+          type: integer
+        description: Filter by venue id
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create seating
+    tags: [Seatings]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Seating"
+    responses:
+      "201":
+        description: Created
+      "400":
+        description: Invalid venue_id
+
+/api/seatings/bulk:
+  post:
+    summary: Bulk create seatings
+    tags: [Seatings]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Seating"
+    responses:
+      "201":
+        description: Created
+
+/api/seatings/{id}:
+  get:
+    summary: Get seating by id
+    tags: [Seatings]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: Not found
+  put:
+    summary: Update seating
+    tags: [Seatings]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Seating"
+    responses:
+      "200":
+        description: Updated
+      "404":
+        description: Not found
+  delete:
+    summary: Delete seating
+    tags: [Seatings]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Deleted
+      "404":
+        description: Not found

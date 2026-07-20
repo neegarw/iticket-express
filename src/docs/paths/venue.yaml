@@ -1,0 +1,87 @@
+/api/venues:
+  get:
+    summary: Get all venues
+    tags: [Venues]
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create venue
+    tags: [Venues]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Venue"
+    responses:
+      "201":
+        description: Created
+
+/api/venues/{id}:
+  get:
+    summary: Get venue by id
+    tags: [Venues]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+  put:
+    summary: Update venue
+    tags: [Venues]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Venue"
+    responses:
+      "200":
+        description: Updated
+  delete:
+    summary: Delete venue
+    tags: [Venues]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Deleted
+
+/api/venues/bulk:
+  post:
+    summary: Bulk create venues
+    tags: [Venues]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Venue"
+    responses:
+      "201":
+        description: Created

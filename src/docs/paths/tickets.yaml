@@ -1,0 +1,106 @@
+/api/tickets:
+  get:
+    summary: Get all tickets
+    tags: [Tickets]
+    parameters:
+      - in: query
+        name: seating_id
+        schema:
+          type: integer
+        description: Filter by seating id
+      - in: query
+        name: venue_id
+        schema:
+          type: integer
+        description: Filter by venue id
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create ticket
+    tags: [Tickets]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Ticket"
+    responses:
+      "201":
+        description: Created
+      "400":
+        description: Invalid seating_id or venue_id
+
+/api/tickets/bulk:
+  post:
+    summary: Bulk create tickets
+    tags: [Tickets]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Ticket"
+    responses:
+      "201":
+        description: Created
+
+/api/tickets/{id}:
+  get:
+    summary: Get ticket by id
+    tags: [Tickets]
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: Not found
+  put:
+    summary: Update ticket
+    tags: [Tickets]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Ticket"
+    responses:
+      "200":
+        description: Updated
+      "404":
+        description: Not found
+  delete:
+    summary: Delete ticket
+    tags: [Tickets]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Deleted
+      "404":
+        description: Not found

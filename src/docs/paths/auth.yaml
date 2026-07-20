@@ -1,0 +1,133 @@
+/api/auth/register:
+  post:
+    summary: Register a new user
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Register"
+    responses:
+      "201":
+        description: Registered successfully
+      "400":
+        description: Validation error
+      "409":
+        description: Email already exists
+
+/api/auth/verify-email:
+  post:
+    summary: Verify email with OTP
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/VerifyEmail"
+    responses:
+      "200":
+        description: Email verified
+      "400":
+        description: Invalid or expired OTP
+      "404":
+        description: User not found
+
+/api/auth/resend-otp:
+  post:
+    summary: Resend verification OTP
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailOnly"
+    responses:
+      "200":
+        description: OTP sent successfully
+      "404":
+        description: User not found
+
+/api/auth/login:
+  post:
+    summary: Login
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Login"
+    responses:
+      "200":
+        description: Login successful
+      "401":
+        description: Invalid credentials
+      "403":
+        description: Email not verified
+
+/api/auth/forgot-password:
+  post:
+    summary: Send password reset OTP
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailOnly"
+    responses:
+      "200":
+        description: OTP sent
+
+/api/auth/reset-password:
+  post:
+    summary: Reset password
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ResetPassword"
+    responses:
+      "200":
+        description: Password reset successfully
+      "400":
+        description: Invalid OTP
+
+/api/auth/google:
+  post:
+    summary: Login/Register with Google
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GoogleAuth"
+    responses:
+      "200":
+        description: Google authentication successful
+
+/api/auth/logout:
+  post:
+    summary: Logout user
+    tags: [Auth]
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Logged out successfully
+
+/api/auth/me:
+  get:
+    summary: Get current authenticated user
+    tags: [Auth]
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Current user information

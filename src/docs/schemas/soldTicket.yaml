@@ -1,0 +1,22 @@
+type: object
+required:
+  - seating_number
+  - sold_price
+  - seating_id
+  - order_id
+properties:
+  id:
+    type: integer
+    example: 1
+  seating_number:
+    type: integer
+    example: 12
+  sold_price:
+    type: integer
+    example: 75
+  seating_id:
+    type: integer
+    example: 3
+  order_id:
+    type: integer
+    example: 5

@@ -274,3 +274,10 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   respond(res, 200, { user: req.user!.toSafeJSON() });
 };
+
+export const logout = async (_req: Request, res: Response): Promise<void> => {
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};

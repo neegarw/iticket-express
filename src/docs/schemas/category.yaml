@@ -1,0 +1,37 @@
+type: object
+
+required:
+  - name_az
+  - name_ru
+  - name_en
+
+properties:
+  id:
+    type: integer
+    example: 1
+
+  name_az:
+    type: string
+    example: Konsert
+
+  name_ru:
+    type: string
+    example: Концерт
+
+  name_en:
+    type: string
+    example: Concert
+
+  is_active:
+    type: boolean
+    example: true
+
+  created_at:
+    type: string
+    format: date-time
+    example: "2026-07-20T12:30:00.000Z"
+
+  updated_at:
+    type: string
+    format: date-time
+    example: "2026-07-20T12:30:00.000Z"

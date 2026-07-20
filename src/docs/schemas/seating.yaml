@@ -1,0 +1,18 @@
+type: object
+required:
+  - name
+  - count
+  - venue_id
+properties:
+  id:
+    type: integer
+    example: 1
+  name:
+    type: string
+    example: VIP Zone A
+  count:
+    type: integer
+    example: 100
+  venue_id:
+    type: integer
+    example: 1

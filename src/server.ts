@@ -4,6 +4,11 @@ import cors from "cors";
 import sequelize from "./config/db";
 import path from "path";
 
+import fs from "fs";
+import swaggerUi from "swagger-ui-express";
+import SwaggerParser from "@apidevtools/swagger-parser";
+import YAML from "yamljs";
+
 import categoryRouter from "./routes/category.router";
 import venueRoutes from "./routes/venue.router";
 import eventRoutes from "./routes/event.router";
@@ -54,22 +59,75 @@ app.use("/api/payments", paymentRoutes);
 
 app.get("/", (_req, res) => res.send("API is running..."));
 
-app.use((_req, res) => {
-  res.status(404).json({ success: false, message: "Route not found" });
-});
-
 const PORT = Number(process.env.PORT) || 3000;
 
-app.listen(PORT, "0.0.0.0", async () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+async function setupSwagger() {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Database connected");
-    await sequelize.sync({ alter: true });
-    console.log("✅ Models synced");
-    await seedPermissions();
+    const swaggerDocument = (await SwaggerParser.bundle(
+      path.join(__dirname, "docs", "swagger.yaml")
+    )) as any;
+
+    const pathsDir = path.join(__dirname, "docs", "paths");
+    const pathFiles = fs
+      .readdirSync(pathsDir)
+      .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
+
+    let mergedPaths = { ...swaggerDocument.paths };
+    for (const file of pathFiles) {
+      const loaded = YAML.load(path.join(pathsDir, file));
+      mergedPaths = { ...mergedPaths, ...loaded };
+    }
+
+    swaggerDocument.paths = mergedPaths;
+    const schemasDir = path.join(__dirname, "docs", "schemas");
+    const schemaFiles = fs
+      .readdirSync(schemasDir)
+      .filter((file) => file.endsWith(".yaml") || file.endsWith(".yml"));
+
+    let mergedSchemas = { ...swaggerDocument.components?.schemas };
+    for (const file of schemaFiles) {
+      const loaded = YAML.load(path.join(schemasDir, file));
+
+      if (loaded && typeof loaded === "object" && !loaded.type) {
+        mergedSchemas = { ...mergedSchemas, ...loaded };
+      } else {
+        const name = path.basename(file, path.extname(file));
+        const schemaName = name.charAt(0).toUpperCase() + name.slice(1);
+        mergedSchemas[schemaName] = loaded;
+      }
+    }
+
+    swaggerDocument.components = {
+      ...swaggerDocument.components,
+      schemas: mergedSchemas,
+    };
+
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    console.log("✅ Swagger docs loaded at /api-docs");
   } catch (error) {
-    console.error("❌ Database connection error:", error);
-    process.exit(1);
+    console.error("❌ Swagger bundling error:", error);
   }
-});
+}
+
+async function bootstrap() {
+  await setupSwagger();
+  app.use((_req, res) => {
+    res.status(404).json({ success: false, message: "Route not found" });
+  });
+
+  app.listen(PORT, "0.0.0.0", async () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Database connected");
+      await sequelize.sync();
+      console.log("✅ Models synced");
+      await seedPermissions();
+    } catch (error) {
+      console.error("❌ Database connection error:", error);
+      process.exit(1);
+    }
+  });
+}
+
+bootstrap();

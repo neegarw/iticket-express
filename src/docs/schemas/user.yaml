@@ -1,0 +1,42 @@
+type: object
+
+required:
+  - name
+  - surname
+  - email
+
+properties:
+  id:
+    type: integer
+    example: 1
+
+  name:
+    type: string
+    example: Nigar
+
+  surname:
+    type: string
+    example: Aliyeva
+
+  bio:
+    type: string
+    example: Bio
+
+  email:
+    type: string
+    example: nigar@example.com
+
+  phone:
+    type: string
+    example: "+994501234567"
+
+  role:
+    type: string
+    enum:
+      - superadmin
+      - admin
+      - user
+
+  isVerified:
+    type: boolean
+    example: true

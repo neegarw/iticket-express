@@ -1,0 +1,117 @@
+/api/orders:
+  get:
+    summary: Get all orders for the logged-in user
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Success
+  post:
+    summary: Create order (optionally with a promo code)
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - seating_id
+              - ticket_count
+            properties:
+              seating_id:
+                type: integer
+                example: 3
+              ticket_count:
+                type: integer
+                example: 2
+              promocode:
+                type: string
+                example: SUMMER25
+    responses:
+      "201":
+        description: Order created
+      "400":
+        description: Seating not found or not enough tickets available
+
+/api/orders/{id}:
+  get:
+    summary: Get order by id (own order only)
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: Not found
+
+/api/orders/{id}/cancel:
+  patch:
+    summary: Cancel own order
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Order cancelled
+      "400":
+        description: Confirmed order cannot be cancelled
+      "404":
+        description: Not found
+
+/api/orders/admin/all:
+  get:
+    summary: Get all orders (admin)
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Success
+
+/api/orders/admin/{id}/status:
+  patch:
+    summary: Update order status (admin)
+    tags: [Orders]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+                enum: [pending, confirmed, cancelled]
+                example: confirmed
+    responses:
+      "200":
+        description: Status updated
+      "404":
+        description: Not found

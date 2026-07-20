@@ -1,0 +1,28 @@
+type: object
+required:
+  - method
+  - order_id
+properties:
+  id:
+    type: integer
+    example: 1
+  method:
+    type: string
+    enum: [card, cash, online]
+    example: card
+  status:
+    type: string
+    enum: [pending, success, failed]
+    example: success
+  transaction_id:
+    type: string
+    nullable: true
+    example: TXN-1732000000000
+  order_id:
+    type: integer
+    example: 5
+  paid_at:
+    type: string
+    format: date-time
+    nullable: true
+    example: "2026-07-20T12:00:00.000Z"

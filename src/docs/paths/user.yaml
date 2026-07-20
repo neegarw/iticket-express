@@ -1,0 +1,91 @@
+/api/users/profile:
+  get:
+    summary: Get profile
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Success
+
+  put:
+    summary: Update profile
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    responses:
+      "200":
+        description: Profile updated
+
+  delete:
+    summary: Delete account
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Account deleted
+
+/api/users/change-password:
+  put:
+    summary: Change password
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - currentPassword
+              - newPassword
+            properties:
+              currentPassword:
+                type: string
+              newPassword:
+                type: string
+    responses:
+      "200":
+        description: Password changed
+
+/api/users:
+  get:
+    summary: Get all users
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Success
+
+/api/users/{id}:
+  get:
+    summary: Get user by id
+    tags:
+      - Users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "404":
+        description: User not found

@@ -1,0 +1,97 @@
+Register:
+  type: object
+  required:
+    - name
+    - surname
+    - email
+    - password
+  properties:
+    name:
+      type: string
+      example: John
+    surname:
+      type: string
+      example: Doe
+    bio:
+      type: string
+      nullable: true
+      example: Backend Developer
+    phone:
+      type: string
+      nullable: true
+      example: "+994501112233"
+    email:
+      type: string
+      format: email
+      example: john@example.com
+    password:
+      type: string
+      format: password
+      example: "12345678"
+
+Login:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+    password:
+      type: string
+      format: password
+      example: "12345678"
+
+VerifyEmail:
+  type: object
+  required:
+    - email
+    - otp
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+    otp:
+      type: string
+      example: "123456"
+
+EmailOnly:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+
+ResetPassword:
+  type: object
+  required:
+    - email
+    - otp
+    - newPassword
+  properties:
+    email:
+      type: string
+      format: email
+      example: john@example.com
+    otp:
+      type: string
+      example: "123456"
+    newPassword:
+      type: string
+      format: password
+      example: "newPassword123"
+
+GoogleAuth:
+  type: object
+  required:
+    - idToken
+  properties:
+    idToken:
+      type: string
+      example: eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...
