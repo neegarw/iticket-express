@@ -7,7 +7,7 @@
         name: sortBy
         schema:
           type: string
-          enum: [id, seating_number, sold_price, seating_id, order_id]
+          enum: [id, seating_number, sold_price, ticket_id, order_id]
         description: Field to sort by
       - in: query
         name: order
@@ -25,6 +25,16 @@
         schema:
           type: integer
         description: Items per page (max 100)
+      - in: query
+        name: ticket_id
+        schema:
+          type: integer
+        description: Filter by ticket id
+      - in: query
+        name: order_id
+        schema:
+          type: integer
+        description: Filter by order id
     responses:
       "200":
         description: Success
@@ -42,6 +52,8 @@
     responses:
       "201":
         description: Created
+      "400":
+        description: Invalid ticket_id or order_id, or this seating_number is already sold for this ticket
 
 /api/sold-tickets/{id}:
   get:
@@ -78,6 +90,8 @@
     responses:
       "200":
         description: Updated
+      "400":
+        description: Invalid ticket_id or order_id, or this seating_number is already sold for this ticket
       "404":
         description: Not found
   delete:
@@ -96,3 +110,26 @@
         description: Deleted
       "404":
         description: Not found
+
+components:
+  schemas:
+    SoldTicket:
+      type: object
+      required:
+        - seating_number
+        - sold_price
+        - ticket_id
+        - order_id
+      properties:
+        seating_number:
+          type: integer
+          example: 14
+        sold_price:
+          type: integer
+          example: 20
+        ticket_id:
+          type: integer
+          example: 3
+        order_id:
+          type: integer
+          example: 7
