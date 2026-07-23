@@ -1,0 +1,18 @@
+GrantPermission:
+  type: object
+  required:
+    - adminId
+    - permissionKey
+  properties:
+    adminId:
+      type: integer
+      example: 4
+    permissionKey:
+      type: string
+      example: manage_tickets
+      description: >
+        One of the seeded permission keys: create_event, edit_event,
+        delete_event, create_venue, edit_venue, delete_venue,
+        create_category, edit_category, delete_category, manage_seats,
+        manage_tickets, manage_orders, manage_promocodes, manage_users,
+        view_payments, manage_support

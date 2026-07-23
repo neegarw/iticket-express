@@ -1,0 +1,129 @@
+/api/admin/admins:
+  get:
+    summary: Get all admins
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Success
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+
+/api/admin/permissions/{adminId}:
+  get:
+    summary: Get permissions of a specific admin
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: adminId
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Success
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+      "404":
+        description: Admin not found
+
+/api/admin/make-admin/{userId}:
+  patch:
+    summary: Promote a user to admin
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: User promoted to admin
+      "400":
+        description: Cannot modify a superadmin
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+      "404":
+        description: User not found
+
+/api/admin/remove-admin/{userId}:
+  patch:
+    summary: Demote an admin back to regular user
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Admin demoted to user
+      "400":
+        description: Cannot modify a superadmin
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+      "404":
+        description: User not found
+
+/api/admin/grant-permission:
+  post:
+    summary: Grant a permission to an admin
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GrantPermission"
+    responses:
+      "200":
+        description: Permission granted (or already existed)
+      "400":
+        description: Target user is not an admin
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+      "404":
+        description: Permission not found
+
+/api/admin/revoke-permission:
+  delete:
+    summary: Revoke a permission from an admin
+    tags: [Admin]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GrantPermission"
+    responses:
+      "200":
+        description: Permission revoked (or did not exist)
+      "401":
+        description: Unauthorized
+      "403":
+        description: Forbidden - superadmin only
+      "404":
+        description: Permission not found

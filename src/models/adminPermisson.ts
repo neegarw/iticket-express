@@ -5,13 +5,13 @@ import Permission from "./permission.model";
 
 export interface AdminPermissionAttributes {
   id: number;
-  adminId: number;      // icazə verilən admin
-  permissionId: number; // hansı icazə
-  grantedBy: number;    // superadmin-in id-si
+  adminId: number;
+  permissionId: number;
+  grantedBy: number | null;   // artıq null ola bilər
 }
 
 export interface AdminPermissionCreationAttributes
-  extends Optional<AdminPermissionAttributes, "id"> {}
+  extends Optional<AdminPermissionAttributes, "id" | "grantedBy"> {}
 
 class AdminPermission
   extends Model<AdminPermissionAttributes, AdminPermissionCreationAttributes>
@@ -20,7 +20,7 @@ class AdminPermission
   public id!: number;
   public adminId!: number;
   public permissionId!: number;
-  public grantedBy!: number;
+  public grantedBy!: number | null;
 }
 
 AdminPermission.init(
@@ -40,8 +40,9 @@ AdminPermission.init(
     },
     grantedBy: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,          // dəyişdi: false → true
       references: { model: "users", key: "id" },
+      onDelete: "SET NULL",     // əlavə olundu
     },
   },
   {
@@ -50,7 +51,7 @@ AdminPermission.init(
     modelName: "AdminPermission",
     timestamps: false,
     indexes: [
-      { unique: true, fields: ["adminId", "permissionId"] }, // duplicate olmasm
+      { unique: true, fields: ["adminId", "permissionId"] },
     ],
   }
 );

@@ -9,11 +9,6 @@
           type: integer
         description: Filter by seating id
       - in: query
-        name: venue_id
-        schema:
-          type: integer
-        description: Filter by venue id
-      - in: query
         name: event_id
         schema:
           type: integer
@@ -36,7 +31,7 @@
       "201":
         description: Created
       "400":
-        description: Invalid seating_id, venue_id, event_id, or seating/event does not belong to the given venue
+        description: Invalid seating_id or event_id, or seating does not belong to the venue where the event takes place
 
 /api/tickets/bulk:
   post:
@@ -56,7 +51,7 @@
       "201":
         description: Created
       "400":
-        description: Invalid seating_id, venue_id, event_id, or seating/event does not belong to the given venue for one or more items
+        description: Invalid seating_id or event_id, or seating does not belong to the venue where the event takes place, for one or more items
 
 /api/tickets/{id}:
   get:
@@ -94,7 +89,7 @@
       "200":
         description: Updated
       "400":
-        description: Invalid seating_id, venue_id, event_id, or seating/event does not belong to the given venue
+        description: Invalid seating_id or event_id, or seating does not belong to the venue where the event takes place
       "404":
         description: Not found
   delete:
@@ -123,18 +118,17 @@ components:
       required:
         - price
         - seating_id
-        - venue_id
         - event_id
       properties:
+        id:
+          type: integer
+          example: 1
         price:
           type: integer
-          example: 25
+          example: 50
         seating_id:
           type: integer
           example: 3
-        venue_id:
-          type: integer
-          example: 1
         event_id:
           type: integer
-          example: 5
+          example: 2

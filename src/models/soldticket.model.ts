@@ -1,15 +1,9 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db";
-
-interface SoldTicketAttributes {
-  id: number;
-  seating_number: number;
-  sold_price: number;
-  order_id: number;
-  ticket_id?: number; // Optional property for the foreign key to Ticket
-}
-
-interface SoldTicketCreationAttributes extends Optional<SoldTicketAttributes, "id"> {}
+import {
+  SoldTicketAttributes,
+  SoldTicketCreationAttributes,
+} from "../types/soldticket.types";
 
 export class SoldTicket
   extends Model<SoldTicketAttributes, SoldTicketCreationAttributes>
@@ -19,7 +13,7 @@ export class SoldTicket
   public seating_number!: number;
   public sold_price!: number;
   public order_id!: number;
-  public ticket_id?: number; // Optional property for the foreign key to Ticket
+  public ticket_id!: number;
 }
 
 SoldTicket.init(
@@ -28,7 +22,7 @@ SoldTicket.init(
     seating_number: { type: DataTypes.INTEGER, allowNull: false },
     sold_price: { type: DataTypes.INTEGER, allowNull: false },
     order_id: { type: DataTypes.INTEGER, allowNull: false },
-    ticket_id: { type: DataTypes.INTEGER, allowNull: true }, // Optional foreign key to Ticket
+    ticket_id: { type: DataTypes.INTEGER, allowNull: false },
   },
   { sequelize, tableName: "sold_tickets", timestamps: false }
 );

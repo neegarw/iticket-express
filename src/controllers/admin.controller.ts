@@ -37,8 +37,10 @@ export const removeAdmin = async (req: AuthRequest, res: Response): Promise<void
 export const grantPermission = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { adminId, permissionKey } = req.body;
-    const admin = await User.findByPk(Number(adminId));
-    if (!admin || admin.role !== "admin") { respond(res, 400, { message: "Yalnız adminlərə icazə verilə bilər" }); return; }
+    if (!adminId || !permissionKey) {
+      respond(res, 400, { message: "adminId və permissionKey mütləqdir" });
+      return;
+    }
     const permission = await Permission.findOne({ where: { key: permissionKey } });
     if (!permission) { respond(res, 404, { message: "İcazə tapılmadı" }); return; }
     const [, created] = await AdminPermission.findOrCreate({
@@ -54,9 +56,16 @@ export const grantPermission = async (req: AuthRequest, res: Response): Promise<
 export const revokePermission = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { adminId, permissionKey } = req.body;
+
+    const admin = await User.findByPk(Number(adminId));
+    if (!admin) { respond(res, 404, { message: "İstifadəçi tapılmadı" }); return; }
+
     const permission = await Permission.findOne({ where: { key: permissionKey } });
     if (!permission) { respond(res, 404, { message: "İcazə tapılmadı" }); return; }
-    const deleted = await AdminPermission.destroy({ where: { adminId, permissionId: permission.id } });
+
+    const deleted = await AdminPermission.destroy({
+      where: { adminId: Number(adminId), permissionId: permission.id },
+    });
     respond(res, 200, { message: deleted ? "İcazə alındı" : "Bu icazə mövcud deyildi" });
   } catch (err) {
     respond(res, 500, { message: "Xəta", error: (err as Error).message });

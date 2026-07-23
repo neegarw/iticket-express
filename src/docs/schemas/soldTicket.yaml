@@ -2,7 +2,7 @@ type: object
 required:
   - seating_number
   - sold_price
-  - seating_id
+  - ticket_id
   - order_id
 properties:
   id:
@@ -14,7 +14,7 @@ properties:
   sold_price:
     type: integer
     example: 75
-  seating_id:
+  ticket_id:
     type: integer
     example: 3
   order_id:

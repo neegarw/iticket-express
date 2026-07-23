@@ -1,0 +1,19 @@
+Ticket:
+  type: object
+  required:
+    - price
+    - seating_id
+    - event_id
+  properties:
+    id:
+      type: integer
+      example: 1
+    price:
+      type: integer
+      example: 50
+    seating_id:
+      type: integer
+      example: 3
+    event_id:
+      type: integer
+      example: 2
