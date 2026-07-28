@@ -2,10 +2,10 @@ import { Optional } from "sequelize";
 
 export interface TicketAttributes {
   id: number;
-  price: number;
-  seating_id: number;
-  event_id: number;
+  event_seat_id: number;
+  order_id: number;
+  qr_code: string;
 }
 
 export interface TicketCreationAttributes
-  extends Optional<TicketAttributes, "id"> {}
+  extends Optional<TicketAttributes, "id" | "qr_code"> {}

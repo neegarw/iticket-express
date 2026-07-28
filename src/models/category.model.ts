@@ -1,8 +1,11 @@
-// src/models/category.model.ts
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../config/db";
+import sequelize from "../config/db";
+import { CategoryAttributes, CategoryCreationAttributes } from "../types/category.type";
 
-export class Category extends Model {
+export class Category
+  extends Model<CategoryAttributes, CategoryCreationAttributes>
+  implements CategoryAttributes
+{
   public id!: number;
   public name_az!: string;
   public name_ru!: string;
@@ -20,27 +23,10 @@ Category.init(
       autoIncrement: true,
       primaryKey: true,
     },
-
-    name_az: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    name_ru: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    name_en: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
+    name_az: { type: DataTypes.STRING, allowNull: false },
+    name_ru: { type: DataTypes.STRING, allowNull: false },
+    name_en: { type: DataTypes.STRING, allowNull: false },
+    is_active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   {
     sequelize,

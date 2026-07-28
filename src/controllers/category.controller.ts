@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Category } from "../models/category.model";
+import { Event } from "../models/event.model";
 import { Op } from "sequelize";
 
 
@@ -28,21 +29,9 @@ export const getAll = async (req: Request, res: Response) => {
         const whereClause = search
             ? {
                 [Op.or]: [
-                    {
-                        name_az: {
-                            [Op.like]: `%${search}%`,
-                        },
-                    },
-                    {
-                        name_ru: {
-                            [Op.like]: `%${search}%`,
-                        },
-                    },
-                    {
-                        name_en: {
-                            [Op.like]: `%${search}%`,
-                        },
-                    },
+                    { name_az: { [Op.like]: `%${search}%` } },
+                    { name_ru: { [Op.like]: `%${search}%` } },
+                    { name_en: { [Op.like]: `%${search}%` } },
                 ],
             }
             : {};
@@ -147,6 +136,14 @@ export const remove = async (req: Request, res: Response) => {
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
+
+        const eventCount = await Event.count({ where: { category_id: category.id } });
+        if (eventCount > 0) {
+            return res.status(400).json({
+                message: `Bu kateqoriyaya aid ${eventCount} tədbir var, əvvəlcə onları silin və ya köçürün`,
+            });
+        }
+
         await category.destroy();
         res.status(200).json({
             message: "Category deleted successfully",

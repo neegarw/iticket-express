@@ -15,11 +15,13 @@ import eventRoutes from "./routes/event.router";
 import authRoutes from "./routes/auth.router";
 import userRoutes from "./routes/user.router";
 import adminRoutes from "./routes/admin.router";
-import seatRoutes from "./routes/seating.router";
+import seatingRoutes from "./routes/seating.router";
 import ticketRoutes from "./routes/ticket.router";
 import promoRoutes from "./routes/promocode.router";
 import orderRoutes from "./routes/order.router";
 import paymentRoutes from "./routes/payment.router";
+import seatRoutes from "./routes/seat.router";
+import eventSeatRoutes from "./routes/eventseat.router";
 
 import { seedPermissions } from "./seeders/permission.seeder";
 
@@ -51,8 +53,10 @@ app.use("/api/events", eventRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/seatings", seatRoutes);
+app.use("/api/seatings", seatingRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/seats", seatRoutes);
+app.use("/api/event-seats", eventSeatRoutes);
 app.use("/api/promocodes", promoRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);

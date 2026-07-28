@@ -5,13 +5,13 @@ import { getAll, getById, create, update, remove } from "../controllers/seating.
 import { bulkCreate } from "../controllers/seating.controller";
 
 
-const seatRouter = Router();
+const seatingRouter = Router();
 
-seatRouter.get("/", getAll);
-seatRouter.get("/:id", getById);
-seatRouter.post("/", protect, requirePermission("manage_seats"), create);
-seatRouter.post("/bulk", protect, requirePermission("manage_seats"), bulkCreate);
-seatRouter.put("/:id", protect, requirePermission("manage_seats"), update);
-seatRouter.delete("/:id", protect, requirePermission("manage_seats"), remove);
+seatingRouter.get("/", getAll);
+seatingRouter.get("/:id", getById);
+seatingRouter.post("/", protect, requirePermission("manage_seats"), create);
+seatingRouter.post("/bulk", protect, requirePermission("manage_seats"), bulkCreate);
+seatingRouter.put("/:id", protect, requirePermission("manage_seats"), update);
+seatingRouter.delete("/:id", protect, requirePermission("manage_seats"), remove);
 
-export default seatRouter;
+export default seatingRouter;

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import {Venue} from '../models/venue.model'
+import { Venue } from '../models/venue.model';
+import { Event } from '../models/event.model';
 import { Op } from 'sequelize';
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -41,7 +42,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const bulkCreateVenues = async (req: Request, res: Response) => {
   try {
     const venues = await Venue.bulkCreate(req.body);
-
     res.status(201).json(venues);
   } catch (error) {
     res.status(500).json({
@@ -52,8 +52,13 @@ export const bulkCreateVenues = async (req: Request, res: Response) => {
 
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
-    await Venue.update(req.body, { where: { id: Number(req.params.id) } });
-    res.json({ message: 'Yeniləndi' });
+    const venue = await Venue.findByPk(Number(req.params.id));
+    if (!venue) {
+      res.status(404).json({ message: 'Tapılmadı' });
+      return;
+    }
+    await venue.update(req.body);
+    res.json({ message: 'Yeniləndi', data: venue });
   } catch (err) {
     res.status(500).json({ message: (err as Error).message });
   }
@@ -61,7 +66,21 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
-    await Venue.destroy({ where: { id: Number(req.params.id) } });
+    const venue = await Venue.findByPk(Number(req.params.id));
+    if (!venue) {
+      res.status(404).json({ message: 'Tapılmadı' });
+      return;
+    }
+
+    const eventCount = await Event.count({ where: { venue_id: venue.id } });
+    if (eventCount > 0) {
+      res.status(400).json({
+        message: `Bu məkana aid ${eventCount} tədbir var, əvvəlcə onları silin və ya köçürün`,
+      });
+      return;
+    }
+
+    await venue.destroy();
     res.json({ message: 'Silindi' });
   } catch (err) {
     res.status(500).json({ message: (err as Error).message });
