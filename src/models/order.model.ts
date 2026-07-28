@@ -1,19 +1,7 @@
-import { DataTypes, Model, Optional } from "sequelize";
+// src/models/order.model.ts
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db";
-
-export type OrderStatus = "pending" | "confirmed" | "cancelled";
-
-interface OrderAttributes {
-  id: number;
-  date: Date;
-  status: OrderStatus;
-  total_price: number;
-  seating_id: number;
-  user_id: number;
-  promocode_id?: number;
-}
-
-interface OrderCreationAttributes extends Optional<OrderAttributes, "id" | "promocode_id"> {}
+import { OrderAttributes, OrderCreationAttributes, OrderStatus } from "../types/order.types";
 
 export class Order
   extends Model<OrderAttributes, OrderCreationAttributes>
@@ -23,9 +11,8 @@ export class Order
   public date!: Date;
   public status!: OrderStatus;
   public total_price!: number;
-  public seating_id!: number;
   public user_id!: number;
-  public promocode_id!: number;
+  public promocode_id!: number | null;
 }
 
 Order.init(
@@ -37,8 +24,7 @@ Order.init(
       allowNull: false,
       defaultValue: "pending",
     },
-    total_price: { type: DataTypes.INTEGER, allowNull: false },
-    seating_id: { type: DataTypes.INTEGER, allowNull: false },
+    total_price: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     user_id: { type: DataTypes.INTEGER, allowNull: false },
     promocode_id: { type: DataTypes.INTEGER, allowNull: true },
   },

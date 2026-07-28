@@ -1,19 +1,11 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db";
-
-export type PaymentMethod = "card" | "cash" | "online";
-export type PaymentStatus = "pending" | "success" | "failed";
-
-interface PaymentAttributes {
-  id: number;
-  method: PaymentMethod;
-  status: PaymentStatus;
-  transaction_id?: string;
-  order_id: number;
-  paid_at?: Date;
-}
-
-interface PaymentCreationAttributes extends Optional<PaymentAttributes, "id" | "transaction_id" | "paid_at"> {}
+import {
+  PaymentAttributes,
+  PaymentCreationAttributes,
+  PaymentMethod,
+  PaymentStatus,
+} from "../types/payment.types";
 
 export class Payment
   extends Model<PaymentAttributes, PaymentCreationAttributes>
@@ -22,9 +14,9 @@ export class Payment
   public id!: number;
   public method!: PaymentMethod;
   public status!: PaymentStatus;
-  public transaction_id!: string;
+  public transaction_id!: string | null;
   public order_id!: number;
-  public paid_at!: Date;
+  public paid_at!: Date | null;
 }
 
 Payment.init(

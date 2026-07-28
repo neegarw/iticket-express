@@ -5,7 +5,7 @@ export interface EventSeatAttributes {
   event_id: number;
   seat_id: number;
   price: number;
-  status: "available" | "reserved" | "sold";
+  status: "available" | "sold";
 }
 
 export interface EventSeatCreationAttributes
