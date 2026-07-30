@@ -12,7 +12,6 @@ router.get("/profile",          getProfile);
 router.put("/profile",          updateProfile);
 router.put("/change-password",  changePassword);
 router.delete("/profile",       deleteAccount);
-
 // (Admin) list all users / get by id
 router.get("/",     getAllUsers);
 router.get("/:id",  getUserById);

@@ -11,6 +11,8 @@ import { Payment } from "./payment.model";
 import User from "./user.model";
 import Permission from "./permission.model";
 import AdminPermission from "./adminPermisson";
+import SupportTicket from "./supportTicket.model";
+import SupportMessage from "./supportMessage.model";
 
 // ─── Category → Event ───────────────────────────
 Category.hasMany(Event, { foreignKey: "category_id" });
@@ -73,6 +75,9 @@ Permission.belongsToMany(User, {
   as: "admins",
 });
 
+SupportTicket.hasMany(SupportMessage, { foreignKey: "ticketId", as: "messages" });
+SupportMessage.belongsTo(SupportTicket, { foreignKey: "ticketId" });
+
 export {
   User,
   Permission,
@@ -87,4 +92,6 @@ export {
   PromoCode,
   Order,
   Payment,
+  SupportTicket,
+  SupportMessage,
 };

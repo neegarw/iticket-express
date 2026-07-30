@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Support</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      background: #f4f5f7;
+      margin: 0;
+      color: #1a1a1a;
+    }
+
+    #loginBox {
+      max-width: 360px;
+      margin: 100px auto;
+      background: #fff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    #loginBox h2 {
+      margin-top: 0;
+    }
+
+    #loginBox input {
+      width: 100%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    #loginBox button,
+    .primaryBtn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #loginBox button:hover,
+    .primaryBtn:hover {
+      background: #4338ca;
+    }
+
+    #app {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: none;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #e0e7ff;
+      color: #4338ca;
+      font-weight: 600;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 16px;
+    }
+
+    .ticketItem {
+      padding: 12px 16px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.15s;
+    }
+
+    .ticketItem:hover {
+      background: #f9fafb;
+      border-color: #c7d2fe;
+    }
+
+    .statusTag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .statusTag.open {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .statusTag.resolved {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .statusTag.closed {
+      background: #e5e7eb;
+      color: #6b7280;
+    }
+
+    #messages {
+      height: 320px;
+      overflow-y: auto;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 10px;
+    }
+
+    .msg {
+      margin-bottom: 12px;
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .msg .sender {
+      font-size: 11px;
+      opacity: 0.7;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .msg.user {
+      background: #4f46e5;
+      color: #fff;
+      margin-left: auto;
+      border-bottom-right-radius: 2px;
+    }
+
+    .msg.agent {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      margin-right: auto;
+      border-bottom-left-radius: 2px;
+    }
+
+    .inputRow {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .inputRow input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .inputRow button {
+      padding: 10px 20px;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .closeBar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .closeBar button {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #ddd;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .stars {
+      font-size: 28px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+
+    .stars span {
+      color: #d1d5db;
+    }
+
+    .stars span.active {
+      color: #fbbf24;
+    }
+
+    #permissionError {
+      color: #b45309;
+      background: #fef3c7;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loginBox">
+    <h2>Support Girişi</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Şifrə" />
+    <button onclick="login()">Daxil ol</button>
+    <p id="loginError" style="color:red; font-size: 13px;"></p>
+  </div>
+
+  <div id="app">
+    <div class="header">
+      <div>Salam, <b id="userName"></b></div>
+      <span class="badge" id="userRole"></span>
+    </div>
+
+    <p id="permissionError" style="display:none;">Support idarə etmək üçün icazəniz yoxdur — öz sorğularınızı
+      görürsünüz.</p>
+
+    <div class="card" id="userView" style="display:none;">
+      <div class="header">
+        <h3 style="margin:0;">Mənim Sorğularım</h3>
+        <button class="primaryBtn" style="width:auto;" onclick="createTicket()">+ Yeni sorğu</button>
+      </div>
+      <div id="myTickets"></div>
+    </div>
+
+    <div class="card" id="adminView" style="display:none;">
+      <h3 style="margin-top:0;">Bütün Sorğular</h3>
+      <div id="allTickets"></div>
+    </div>
+
+    <div class="card" id="chatBox" style="display:none;">
+      <div class="header">
+        <h3 style="margin:0;">Sorğu #<span id="activeTicketId"></span> <span class="statusTag" id="activeStatus"></span>
+        </h3>
+      </div>
+      <div id="messages"></div>
+      <div class="inputRow">
+        <input type="text" id="messageInput" placeholder="Mesaj yaz..."
+          onkeydown="if(event.key==='Enter')sendMessage()" />
+        <button onclick="sendMessage()">Göndər</button>
+      </div>
+
+      <div class="closeBar">
+        <button id="operatorCloseBtn" style="display:none;" onclick="requestClose()">Sorğunu yekunlaşdır</button>
+        <button id="clientCloseBtn" style="display:none;" onclick="openRating()">Sorğunu bitir və qiymətləndir</button>
+      </div>
+
+      <div id="ratingBox" style="display:none; text-align:center; margin-top: 10px;">
+        <p>Operatoru necə qiymətləndirirsiniz?</p>
+        <div class="stars" id="starsRow">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span
+            data-v="5">★</span>
+        </div>
+        <input type="text" id="ratingComment" placeholder="Rəy (istəyə görə)"
+          style="width:80%; padding:8px; border-radius:8px; border:1px solid #ddd;" />
+        <br />
+        <button class="primaryBtn" style="width:auto; margin-top:10px;" onclick="submitRating()">Təsdiqlə</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = null, currentUser = null, socket = null, activeTicketId = null, activeStatus = null, selectedRating = 0;
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!data.success) { document.getElementById("loginError").innerText = data.message; return; }
+
+        token = data.token; currentUser = data.user;
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("userName").innerText = currentUser.name;
+        document.getElementById("userRole").innerText = currentUser.role;
+
+        connectSocket();
+        renderByRole();
+      } catch (err) {
+        document.getElementById("loginError").innerText = "Server xətası: " + err.message;
+      }
+    }
+
+    async function renderByRole() {
+      if (currentUser.role === "user") {
+        document.getElementById("userView").style.display = "block";
+        loadMyTickets();
+        return;
+      }
+      const res = await fetch("/api/support/admin/tickets", { headers: { Authorization: "Bearer " + token } });
+      if (res.status === 403) {
+        document.getElementById("permissionError").style.display = "block";
+        document.getElementById("userView").style.display = "block";
+        loadMyTickets();
+        return;
+      }
+      const data = await res.json();
+      document.getElementById("adminView").style.display = "block";
+      renderTicketList(data.tickets, "allTickets");
+    }
+
+    async function loadMyTickets() {
+      const res = await fetch("/api/support/tickets", { headers: { Authorization: "Bearer " + token } });
+      const data = await res.json();
+      console.log("API cavabı:", data);   // YENİ — bunu əlavə edin
+      renderTicketList(data.tickets, "myTickets");
+    }
+
+    function renderTicketList(tickets, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      if (!tickets || tickets.length === 0) { container.innerHTML = "<p>Sorğu yoxdur</p>"; return; }
+      tickets.forEach((t) => {
+        const div = document.createElement("div");
+        div.className = "ticketItem";
+        div.innerHTML = `<span>#${t.id} — ${t.subject}</span><span class="statusTag ${t.status}">${t.status}</span>`;
+        div.onclick = () => openTicket(t.id, t.status);
+        container.appendChild(div);
+      });
+    }
+
+    async function createTicket() {
+      const subject = prompt("Sorğunuzun mövzusu:");
+      if (!subject) return;
+      await fetch("/api/support/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ subject }),
+      });
+      loadMyTickets();
+    }
+
+    async function openTicket(ticketId, status) {
+      activeTicketId = ticketId; activeStatus = status;
+      document.getElementById("activeTicketId").innerText = ticketId;
+      document.getElementById("activeStatus").innerText = status;
+      document.getElementById("activeStatus").className = "statusTag " + status;
+      document.getElementById("chatBox").style.display = "block";
+      document.getElementById("messages").innerHTML = "";
+      document.getElementById("ratingBox").style.display = "none";
+
+      const isAdmin = currentUser.role === "admin" || currentUser.role === "superadmin";
+      document.getElementById("operatorCloseBtn").style.display = (isAdmin && status !== "closed") ? "inline-block" : "none";
+      document.getElementById("clientCloseBtn").style.display = (!isAdmin && status === "resolved") ? "inline-block" : "none";
+
+      const res = await fetch(`/api/support/tickets/${ticketId}/messages`, { headers: { Authorization: "Bearer " + token } });
+      const data = await res.json();
+      (data.messages || []).forEach(logMessage);
+
+      socket.emit("join_ticket", ticketId);
+    }
+
+    function connectSocket() {
+      socket = io({
+        auth: {
+          token,
+        },
+      });
+
+      socket.on("new_message", (message) => {
+        if (message.ticketId === activeTicketId) {
+          logMessage(message);
+        }
+      });
+
+      socket.on("ticket_status_changed", ({ ticketId, status }) => {
+
+        if (ticketId !== activeTicketId) return;
+
+        activeStatus = status;
+
+        const statusElement = document.getElementById("activeStatus");
+
+        statusElement.innerText = status;
+        statusElement.className = "statusTag " + status;
+
+        const isAdmin =
+          currentUser.role === "admin" ||
+          currentUser.role === "superadmin";
+
+        document.getElementById("clientCloseBtn").style.display =
+          !isAdmin && status === "resolved"
+            ? "inline-block"
+            : "none";
+
+        document.getElementById("operatorCloseBtn").style.display =
+          isAdmin && status !== "closed"
+            ? "inline-block"
+            : "none";
+      });
+    }
+
+    function sendMessage() {
+      const text = document.getElementById("messageInput").value;
+      if (!text || !activeTicketId) return;
+      socket.emit("send_message", { ticketId: activeTicketId, text });
+      document.getElementById("messageInput").value = "";
+    }
+
+    function logMessage(m) {
+      const div = document.getElementById("messages");
+      const el = document.createElement("div");
+      el.className = "msg " + m.senderType;
+      el.innerHTML = `<span class="sender">${m.senderName}</span>${m.message}`;
+      div.appendChild(el);
+      div.scrollTop = div.scrollHeight;
+    }
+
+    async function requestClose() {
+
+      const res = await fetch(
+        `/api/support/admin/tickets/${activeTicketId}/request-close`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.success) {
+        alert(data.message);
+        return;
+      }
+
+      document.getElementById("operatorCloseBtn").style.display = "none";
+
+      if (currentUser.role === "admin" || currentUser.role === "superadmin") {
+        renderByRole();
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("#starsRow span")) {
+        const val = Number(e.target.dataset.v);
+        selectedRating = val;
+        document.querySelectorAll("#starsRow span").forEach((s) => {
+          s.classList.toggle("active", Number(s.dataset.v) <= val);
+        });
+      }
+    });
+    function openRating() {
+      document.getElementById("clientCloseBtn").style.display = "none";
+      document.getElementById("ratingBox").style.display = "block";
+    }
+    async function submitRating() {
+      if (!selectedRating) { alert("Ulduz seçin"); return; }
+      const comment = document.getElementById("ratingComment").value;
+      await fetch(`/api/support/tickets/${activeTicketId}/close`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ rating: selectedRating, comment }),
+      });
+      alert("Təşəkkürlər! Sorğu bağlandı.");
+      document.getElementById("chatBox").style.display = "none";
+      loadMyTickets();
+    }
+  </script>
+</body>
+
+</html>

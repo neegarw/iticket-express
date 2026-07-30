@@ -9,6 +9,9 @@ import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import YAML from "yamljs";
 
+import http from "http";
+import { initSocket } from "./socket/socket";
+
 import categoryRouter from "./routes/category.router";
 import venueRoutes from "./routes/venue.router";
 import eventRoutes from "./routes/event.router";
@@ -22,6 +25,7 @@ import orderRoutes from "./routes/order.router";
 import paymentRoutes from "./routes/payment.router";
 import seatRoutes from "./routes/seat.router";
 import eventSeatRoutes from "./routes/eventseat.router";
+import supportRoutes from "./routes/support.router";
 
 import { seedPermissions } from "./seeders/permission.seeder";
 
@@ -46,6 +50,12 @@ app.set("views", path.join(__dirname, "views"));
 app.get("/test-auth", (_req, res) => {
   res.render("auth", { googleClientId: process.env.GOOGLE_CLIENT_ID });
 });
+app.get("/test-support", (_req, res) => {
+  res.render("support", { googleClientId: process.env.GOOGLE_CLIENT_ID });
+});
+
+const server = http.createServer(app);
+initSocket(server);
 
 app.use("/api/categories", categoryRouter);
 app.use("/api/venues", venueRoutes);
@@ -60,6 +70,7 @@ app.use("/api/event-seats", eventSeatRoutes);
 app.use("/api/promocodes", promoRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/support", supportRoutes);
 
 app.get("/", (_req, res) => res.send("API is running..."));
 
@@ -119,7 +130,7 @@ async function bootstrap() {
     res.status(404).json({ success: false, message: "Route not found" });
   });
 
-  app.listen(PORT, "0.0.0.0", async () => {
+  server.listen(PORT, "0.0.0.0", async () => {
     console.log(`🚀 Server running on port ${PORT}`);
     try {
       await sequelize.authenticate();

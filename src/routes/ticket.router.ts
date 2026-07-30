@@ -1,17 +1,16 @@
-import { Router as TicketRouter } from "express";
-import { getAll as tGetAll, getById as tGetById, create as tCreate, update as tUpdate, remove as tRemove } from "../controllers/ticket.controller";
-import { requirePermission } from "../middlewares/role.middlewares";
+import { Router } from "express";
+import { getMyTickets, getById, getAll, verifyByQr } from "../controllers/ticket.controller";
 import { protect } from "../middlewares/auth.middleware";
-import { bulkCreate } from "../controllers/ticket.controller";
+import { requirePermission } from "../middlewares/role.middlewares";
 
+const ticketRouter = Router();
 
-const ticketRouter = TicketRouter();
+// User
+ticketRouter.get("/my", protect, getMyTickets);
+ticketRouter.get("/:id", protect, getById);
 
-ticketRouter.get("/", tGetAll);
-ticketRouter.get("/:id", tGetById);
-ticketRouter.post("/", protect, requirePermission("manage_tickets"), tCreate);
-ticketRouter.post("/bulk", protect, requirePermission("manage_tickets"), bulkCreate);
-ticketRouter.put("/:id", protect, requirePermission("manage_tickets"), tUpdate);
-ticketRouter.delete("/:id", protect, requirePermission("manage_tickets"), tRemove);
+// Admin
+ticketRouter.get("/", protect, requirePermission("manage_tickets"), getAll);
+ticketRouter.post("/verify", protect, requirePermission("manage_tickets"), verifyByQr);
 
 export default ticketRouter;
