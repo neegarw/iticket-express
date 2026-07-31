@@ -243,6 +243,8 @@
     <div class="header">
       <div>Salam, <b id="userName"></b></div>
       <span class="badge" id="userRole"></span>
+      <button onclick="logout()"
+        style="margin-left:10px; padding:4px 10px; border-radius:6px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:12px;">Çıxış</button>
     </div>
 
     <p id="permissionError" style="display:none;">Support idarə etmək üçün icazəniz yoxdur — öz sorğularınızı
@@ -307,6 +309,11 @@
         if (!data.success) { document.getElementById("loginError").innerText = data.message; return; }
 
         token = data.token; currentUser = data.user;
+
+        token = data.token; currentUser = data.user;
+        localStorage.setItem("support_token", token);
+        localStorage.setItem("support_user", JSON.stringify(currentUser));
+
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("app").style.display = "block";
         document.getElementById("userName").innerText = currentUser.name;
@@ -317,6 +324,12 @@
       } catch (err) {
         document.getElementById("loginError").innerText = "Server xətası: " + err.message;
       }
+    }
+
+    function logout() {
+      localStorage.removeItem("support_token");
+      localStorage.removeItem("support_user");
+      location.reload();
     }
 
     async function renderByRole() {
@@ -385,6 +398,7 @@
       const data = await res.json();
       (data.messages || []).forEach(logMessage);
 
+      document.querySelector(".inputRow").style.display = status === "closed" ? "none" : "flex";
       socket.emit("join_ticket", ticketId);
       const inputRow = document.querySelector(".inputRow");
       if (status === "closed") {
@@ -431,10 +445,19 @@
           isAdmin && status !== "closed"
             ? "inline-block"
             : "none";
-            
+
         document.querySelector(".inputRow").style.display = status === "closed" ? "none" : "flex";
       })
         ;
+      socket.on("message_error", ({ message }) => {
+        alert(message);
+      });
+
+      socket.on("connect_error", (err) => {
+        if (err.message === "Token yanlışdır" || err.message === "Token yoxdur" || err.message === "İstifadəçi tapılmadı") {
+          logout();
+        }
+      });
       socket.on("message_error", ({ message }) => {
         alert(message);
       });
@@ -507,6 +530,20 @@
       document.getElementById("chatBox").style.display = "none";
       loadMyTickets();
     }
+    (function restoreSession() {
+      const savedToken = localStorage.getItem("support_token");
+      const savedUser = localStorage.getItem("support_user");
+      if (savedToken && savedUser) {
+        token = savedToken;
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("userName").innerText = currentUser.name;
+        document.getElementById("userRole").innerText = currentUser.role;
+        connectSocket();
+        renderByRole();
+      }
+    })();
   </script>
 </body>
 
