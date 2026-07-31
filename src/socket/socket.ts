@@ -33,6 +33,15 @@ export const initSocket = (server: http.Server) => {
     });
 
     socket.on("send_message", async (data: { ticketId: number; text: string }) => {
+      // YENİ — ticket bağlıdırsa mesaj qəbul edilmir
+      const ticket = await SupportService.getTicketById(data.ticketId);
+      if (!ticket || ticket.status === "closed") {
+        socket.emit("message_error", {
+          message: "Bu sorğu bağlıdır, mesaj göndərə bilməzsiniz.",
+        });
+        return;
+      }
+
       let senderType: "user" | "agent" = "user";
 
       if (user.role === "superadmin") {

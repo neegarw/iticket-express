@@ -48,3 +48,6 @@ export const closeByClient = async (ticketId: number, rating: number, comment?: 
   await ticket.save();
   return ticket;
 };
+export const getTicketById = async (ticketId: number) => {
+  return SupportTicket.findByPk(ticketId);
+};

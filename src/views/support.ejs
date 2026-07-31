@@ -386,6 +386,12 @@
       (data.messages || []).forEach(logMessage);
 
       socket.emit("join_ticket", ticketId);
+      const inputRow = document.querySelector(".inputRow");
+      if (status === "closed") {
+        inputRow.style.display = "none";
+      } else {
+        inputRow.style.display = "flex";
+      }
     }
 
     function connectSocket() {
@@ -425,6 +431,12 @@
           isAdmin && status !== "closed"
             ? "inline-block"
             : "none";
+            
+        document.querySelector(".inputRow").style.display = status === "closed" ? "none" : "flex";
+      })
+        ;
+      socket.on("message_error", ({ message }) => {
+        alert(message);
       });
     }
 
