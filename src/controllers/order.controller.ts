@@ -161,48 +161,6 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
   }
 };
 
-// Ödənişi təsdiqlə
-export const confirmOrder = async (req: AuthRequest, res: Response): Promise<void> => {
-  const t = await sequelize.transaction();
-  try {
-    const { method, transaction_id } = req.body as {
-      method: "card" | "cash" | "online";
-      transaction_id?: string;
-    };
-
-    const order = await Order.findOne({
-      where: { id: Number(req.params.id), user_id: req.user!.id },
-      transaction: t,
-    });
-
-    if (!order) { await t.rollback(); respond(res, 404, { message: "Tapılmadı" }); return; }
-    if (order.status !== "pending") {
-      await t.rollback();
-      respond(res, 400, { message: "Yalnız pending statuslu sifariş təsdiqlənə bilər" });
-      return;
-    }
-
-    await Payment.create(
-      {
-        method,
-        status: "success",
-        transaction_id: transaction_id ?? null,
-        order_id: order.id,
-        paid_at: new Date(),
-      },
-      { transaction: t }
-    );
-
-    await order.update({ status: "confirmed" }, { transaction: t });
-
-    await t.commit();
-    respond(res, 200, { message: "Sifariş təsdiqləndi", data: order });
-  } catch (err) {
-    await t.rollback();
-    respond(res, 500, { message: (err as Error).message });
-  }
-};
-
 // Sifarişi ləğv et — yer yenidən "available" olur
 export const cancelOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   const t = await sequelize.transaction();
