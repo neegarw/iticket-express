@@ -3,6 +3,9 @@ import { Ticket } from "../models/ticket.model";
 import { EventSeat } from "../models/eventseat.model";
 import { Order } from "../models/order.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { Seat, Seating, Venue } from "../models";
+import { Event } from "../models/event.model";
+import QRCode from "qrcode";
 
 const respond = (res: Response, status: number, data: object) =>
   res.status(status).json({ success: status < 400, ...data });
@@ -86,5 +89,51 @@ export const verifyByQr = async (req: Request, res: Response): Promise<void> => 
     respond(res, 200, { message: "Bilet etibarlıdır", data: ticket });
   } catch (err) {
     respond(res, 500, { message: (err as Error).message });
+  }
+};
+
+export const showTicket = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const ticket = await Ticket.findByPk(Number(req.params.id), {
+      include: [
+        {
+          model: EventSeat,
+          include: [
+            {
+              model: Event,
+              include: [Venue],
+            },
+            {
+              model: Seat,
+              include: [Seating],
+            },
+          ],
+        },
+        {
+          model: Order,
+        },
+      ],
+    });
+
+    if (!ticket) {
+      res.status(404).send("Ticket tapılmadı");
+      return;
+    }
+
+    const qrImage = await QRCode.toDataURL(ticket.qr_code);
+
+    res.render("ticket", {
+      ticket,
+      qrImage,
+    });
+    res.render("ticket", {
+      ticket,
+      qrImage,
+    });
+  } catch (err) {
+    res.status(500).send((err as Error).message);
   }
 };

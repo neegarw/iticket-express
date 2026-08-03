@@ -11,8 +11,8 @@ import { Payment } from "./payment.model";
 import User from "./user.model";
 import Permission from "./permission.model";
 import AdminPermission from "./adminPermisson";
-import SupportTicket from "./supportticket.model";
-import SupportMessage from "./supportmessage.model";
+import SupportTicket from "./supportTicket.model";
+import SupportMessage from "./supportMessage.model";
 
 // ─── Category → Event ───────────────────────────
 Category.hasMany(Event, { foreignKey: "category_id" });
