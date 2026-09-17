@@ -85,7 +85,7 @@ export const bulkCreate = async (req: Request, res: Response): Promise<void> => 
       event_id: number;
       seat_id: number;
       price: number;
-      status?: "available" | "reserved" | "sold";
+      status?: "available" | "sold";
     }[];
 
     if (!Array.isArray(items)) {

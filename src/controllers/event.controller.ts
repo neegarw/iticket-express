@@ -6,7 +6,22 @@ import { Op } from 'sequelize';
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { search, category_id, venue_id, date } = req.query;
+    const {
+      search,
+      category_id,
+      venue_id,
+      date,
+      page = "1",
+      limit = "10",
+    } = req.query;
+
+    const pageNumber = Math.max(Number.parseInt(String(page), 10) || 1, 1);
+    const limitNumber = Math.min(
+      Math.max(Number.parseInt(String(limit), 10) || 10, 1),
+      100
+    );
+    const offset = (pageNumber - 1) * limitNumber;
+
     const where: any = {};
     if (search) {
       where.name = { [Op.like]: `%${search}%` };
@@ -20,16 +35,34 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     if (date) {
       where.date = date;
     }
-    const events = await Event.findAll({
+
+    const { count, rows } = await Event.findAndCountAll({
       where,
       include: [
         { model: Category },
         { model: Venue }
-      ]
+      ],
+      limit: limitNumber,
+      offset,
+      order: [["date", "ASC"]],
+      distinct: true,
     });
-    res.json(events);
+
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        totalItems: count,
+        totalPages: Math.ceil(count / limitNumber),
+      },
+    });
   } catch (err) {
-    res.status(500).json({ message: (err as Error).message });
+    res.status(500).json({
+      success: false,
+      message: (err as Error).message,
+    });
   }
 };
 
